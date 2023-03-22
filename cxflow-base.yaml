@@ -1,0 +1,176 @@
+server:
+  port: 8982
+#logging: 
+#  file:
+#    name: flow.logx
+logging:
+  file:
+    name: flow2.log
+  level:
+    com:
+       checkmarx: DEBUG
+#    org:
+#       apache:
+#          http:
+#             wire: INFO
+#       springframework:
+#          web:
+#             client:
+#               RestTemplate: INFO
+               
+cxflow:
+  #bug-tracker: GitHub
+  #bug-tracker: ServiceNow
+  bug-tracker: WAIT
+  bug-tracker-impl:
+  #  - GitHub
+  #  - Jira
+  #  - CxXml
+  #   - ServiceNow
+  branches:
+    - main
+    - branch1
+  filter-severity:
+  #  - High
+  filter-category:
+  #  - SQL_Injection
+  #  - Stored_XSS
+  #  - Reflected_XSS_All_Clients
+  filter-cwe:
+  filter-status:
+  #mitre-url: https://cwe.mitre.org/data/definitions/%s.html
+  #wiki-url: https://custodela.atlassian.net/wiki/spaces/AS/pages/79462432/Remediation+Guidance
+  codebash-url: https://checkmarx-demo.codebashing.com/courses/
+  enabled-vulnerability-scanners:
+    - sca
+    - sast
+  zip-exclude: /app/src/\.git/.*, .*\.git/.*, \.git/.*, .*\.png, .*\.zip , ScaResolver, .*\.jar
+
+checkmarx:
+  version: 9.0
+  username: ----
+  password: ----
+  client-id: resource_owner_client
+  client-secret: 014DF517-39D1-4453-B7B3-9930C563627C
+  scope: access_control_api sast_rest_api
+  base-url: ----
+  team: /CxServer
+  url: ${checkmarx.base-url}/cxrestapi
+  multi-tenant: false
+  preserve-xml: true
+  #WSDL Config
+  portal-url: ${checkmarx.base-url}/cxwebinterface/Portal/CxWebService.asmx
+  sdk-url: ${checkmarx.base-url}/cxwebinterface/SDK/CxSDKWebService.asmx
+  portal-wsdl: ${checkmarx.base-url}/Portal/CxWebService.asmx?wsdl
+  sdk-wsdl: ${checkmarx.base-url}/SDK/CxSDKWebService.asmx?wsdl
+
+sca:
+  appUrl: https://sca.checkmarx.net
+  apiUrl: https://api-sca.checkmarx.net
+  accessControlUrl: https://platform.checkmarx.net
+  tenant: ----
+  username: ----
+  password: ----
+  team: "/CxServer"
+  include-sources: false
+  exclude-files: "**/*.git/**"
+  #manifests-include-pattern: "!**/*.xml, **/*.yml"
+  fingerprints-include-pattern: "**/*.yml"
+  preserve-xml: true
+  #filter-severity:
+    #- High
+  #filter-policy-violation: true
+  #If User want to check for Direct Dependency specifically below tag can be used and default value is All.  
+  #filter-dependency-type: Direct
+  #Based on threshold severity it will break build even for Direct Dependency.
+  #thresholds-severity:
+    #high: 10000
+    #medium: 15000
+    #low: 10000
+  enable-sca-resolver : true
+  path-to-sca-resolver : /app/src
+
+github:
+  webhook-token: ----
+  token: ----
+  url: https://github.com
+  api-url: https://api.github.com/repos/
+  false-positive-label: false-positive
+  block-merge: true
+  error-merge: true
+
+azure:
+  webhook-token: xxxx
+  token: ----
+  url: https://dev.azure.com
+  issue-type: issue
+  closed-status: Done
+  open-status: To Do
+  api-version: 5.0
+  false-positive-label: false-positive
+  #block-merge: true
+
+cx-xml:
+   file-name-format: "[NAMESPACE]-[REPO]-[BRANCH]-[TIME].xml"
+   data-folder: "/var/lib/jenkins/workspace/CxIntegrations/LGV_XML"
+
+jira:
+   url: ----
+   username: ----
+   token: ----
+   project: CXSAS
+   issue-type: Bug
+   label-prefix: CX
+   priorities:
+     High: Highest
+     Medium: Medium
+     Low: Low
+     Informational: Lowest
+   open-transition: LGV_Reopen
+   close-transition: LGV_Close
+   open-status:
+     - To Do
+     - In Progress
+   closed-status:
+     - Done
+   fields:
+     - type: result
+       name: cwe
+       jira-field-name: CWEs
+       jira-field-type: label
+     - type: result
+       name: category
+       jira-field-name: MyCategory
+       jira-field-type: label
+     - type: result
+       name: similarity-id
+       jira-field-name: MySimId
+       jira-field-type: label
+     - type: static
+       name: not needed1
+       jira-field-name: MyStaticField
+       jira-field-type: text
+       jira-default-value: Hola
+     #- type: static
+     #  name: not needed2
+     #  jira-field-name: MyDropDown
+     #  jira-field-type: single-select
+     #  jira-default-value: Option LGV2
+     #- type: cx
+     #  name: CF1
+     #  jira-field-name: MyCustomField
+     #  jira-field-type: text
+     #  jira-default-value: CxDefValue
+     - type: sca-results
+       name: violates-policy
+       jira-field-name: My Violates Policy
+       jira-field-type: single-select
+     - type: sca-results
+       name: package-name
+       jira-field-name: My Package Name
+       jira-field-type: label
+
+servicenow:
+  apiUrl: https://xxxx.service-now.com/api/now/table
+  username: xxxx
+  password: xxxx

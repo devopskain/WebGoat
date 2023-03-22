@@ -1,0 +1,121 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml 
+
+trigger:
+- master
+- feature/*
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- group: CxFlowPoc
+- group: Web-Goat
+#SAST
+- name: vsastUrl
+  value: $[variables.sastUrl]
+- name: vsastUsername
+  value: $[variables.sastUsername]
+- name: vsastPassword
+  value: $[variables.sastPassword]
+#SCA
+- name: vscaAppUrl
+  value: $[variables.scaAppUrl]
+- name: vscaApiUrl
+  value: $[variables.scaApiUrl]
+- name: vscaAccessControlUrl
+  value: $[variables.scaAccessControlUrl]
+- name: vscaTenant
+  value: $[variables.scaTenant]
+- name: vscaUsername
+  value: $[variables.scaUsername]
+- name: vscaPassword
+  value: $[variables.scaPassword]
+- name: vscaTeam
+  value: $[variables.scaTeam]
+#SNOW
+- name: vsnowApiUrl
+  value: $[variables.snowApiUrl]
+- name: vsnowUsername
+  value: $[variables.snowUsername]
+- name: vsnowPassword
+  value: $[variables.snowPassword]
+
+stages:
+- stage: Security
+  jobs:
+  - job: CxFlow
+    steps:
+    - task: CmdLine@2
+      inputs:
+        script: |
+          echo Downloading SCA Resolver
+          curl -L https://sca-downloads.s3.amazonaws.com/cli/1.14.2/ScaResolver-linux64.tar.gz -o ScaResolver-linux64.tar.gz
+          tar -xvf ScaResolver-linux64.tar.gz
+          rm ScaResolver-linux64.tar.gz
+          chmod +x ScaResolver
+          #ls -l
+          echo Downloading CxFlow
+          wget -O cxflow.jar https://github.com/checkmarx-ltd/cx-flow/releases/download/1.6.38/cx-flow-1.6.38-java11.jar
+          java -version
+          whoami
+          pwd 
+          echo "$(vsastUrl)"
+          echo "$(vsastUsername)"
+          echo "$(vsastPassword)"
+          echo "$(vscaAppUrl)"
+          echo "$(vscaApiUrl)"
+          echo "$(vscaAccessControlUrl)"
+          echo "$(vscaTenant)"
+          echo "$(vscaUsername)"
+          echo "$(vscaPassword)"
+          echo "$(vscaTeam)"
+          echo "$(vsnowApiUrl)"
+          echo "$(vsnowUsername)"
+          echo "$(vsnowPassword)"
+          # Reference https://github.com/checkmarx-ltd/cx-flow/wiki/Execution#command
+          java -jar cxflow.jar \
+                  --spring.config.location="$(Build.Repository.LocalPath)/.azdo/cxflow-base.yaml"  \
+                  --scan \
+                  --f=. \
+                  --cx-project="SPKG0017565-Code-Scanning-Rweb-goat-Bsast-scan-on-pr" \
+                  --exclude-files="*.jar" \
+                  --alt-project="$(System.TeamProject)" \
+                  --namespace="bp-digital" \
+                  --repo-name="$(Build.Repository.Name)" \
+                  --branch="$(Build.SourceBranchName)" \
+                  --cxflow.enabled-vulnerability-scanners="sast,sca" \
+                  --app="WebGoat" \
+                  --project-custom-field="RepoName:web-goat;checkmarx-health-monitor;checkmarx-queue-monitor" \
+                  --project-custom-field="CxReportingLabels:ITSVC0010472 - Code-Scanning" \
+                  --project-custom-field="RepoID:1b1e417c-68dd-454b-b19f-37f7b371178f;b98e1487-8847-4a57-9ee3-f647cc0d3aa8;834e1ba6-3be7-49f4-bd96-0b7194e0cc2c" \
+                  --project-custom-field="BranchName:master;master;master" \
+                  --project-custom-field="LinesOfCode:123456" \
+                  --project-custom-field="ReleaseBranch:no" \
+                  --project-custom-field="Microservice:no" \
+                  --scan-custom-field="PR:Insert PR Number" \
+                  --checkmarx.base-url="$(vsastUrl)" \
+                  --checkmarx.username="$(vsastUsername)" \
+                  --checkmarx.password="$(vsastPassword)" \
+                  --checkmarx.team="$(vscaTeam)" \
+                  --checkmarx.incremental=true \
+                  --checkmarx.vulnerabilityThreshold.high=100000 \
+                  --checkmarx.vulnerabilityThreshold.medium=100000 \
+                  --checkmarx.vulnerabilityThreshold.low=100000 \
+                  --checkmarx.settings-override=true \
+                  --sca.team="$(vscaTeam)" \
+                  --sca.appUrl="$(vscaAppUrl)" \
+                  --sca.apiUrl="$(vscaApiUrl)" \
+                  --sca.accessControlUrl="$(vscaAccessControlUrl)" \
+                  --sca.tenant="$(vscaTenant)" \
+                  --sca.username="$(vscaUsername)" \
+                  --sca.password="$(vscaPassword)" \
+                  --sca.include-sources=false \
+                  --sca.enable-sca-resolver=true \
+                  --sca.sca-resolver-add-parameters="--log-level Debug --project-tags RepoName:'web-goat;checkmarx-health-monitor;checkmarx-queue-monitor' RepoID:'1b1e417c-68dd-454b-b19f-37f7b371178f;b98e1487-8847-4a57-9ee3-f647cc0d3aa8;834e1ba6-3be7-49f4-bd96-0b7194e0cc2c' BranchName:'master;master;master' LinesOfCode:'123456' ReleaseBranch:'no' Microservice:'no' CxReportingLabels:'ITSVC0010472 - Code-Scanning' --bypass-exitcode" \
+                  --sca.path-to-sca-resolver="$(Build.Repository.LocalPath)" \
+                  --servicenow.apiUrl="$(vsnowApiUrl)" \
+                  --servicenow.username="$(vsnowUsername)" \
+                  --servicenow.password="$(vsnowPassword)" \
