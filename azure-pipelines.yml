@@ -7,7 +7,7 @@ resources:
     - repository: bp-via-checkmarx
       type: git
       name: Vulnerability_Identification_and_Awareness/bp-via-checkmarx
-      ref: feature/define-default-branch
+      ref: feature/test-github-repo
 
 variables:
   - group: Web-Goat #delete 
