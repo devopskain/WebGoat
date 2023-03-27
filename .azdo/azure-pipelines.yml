@@ -2,7 +2,7 @@ trigger:
   - master
   - feature/*
 
-resources: #asdef
+resources: #asde
   repositories:
     - repository: bp-via-checkmarx
       type: git
