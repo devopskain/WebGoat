@@ -45,6 +45,6 @@ stages:
         isMicroService: no
         sast: true
         sca: false
-        targetBranch: refs/heads/feature/define-default-branch
-        gitHubScan: true
+        #targetBranch: refs/heads/feature/define-default-branch
+        defaultBranch: main
 
