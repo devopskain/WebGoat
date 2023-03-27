@@ -7,7 +7,7 @@ resources:
     - repository: bp-via-checkmarx
       type: git
       name: Vulnerability_Identification_and_Awareness/bp-via-checkmarx
-      #ref: feature/add-it-service-custom-field
+      ref: feature/define-default-branch
 
 variables:
   - group: Web-Goat #delete 
@@ -32,15 +32,9 @@ stages:
         - release
         repoNames:
         - $(Build.Repository.Name)
-        - checkmarx-health-monitor
-        - checkmarx-queue-monitor
         repoIDS:
         - $(Build.Repository.ID)
-        - b98e1487-8847-4a57-9ee3-f647cc0d3aa8
-        - 834e1ba6-3be7-49f4-bd96-0b7194e0cc2c
         repoBranchNames:
-        - master
-        - master
         - master
         snowApplicationPackageNumber: SPKG0017565
         projectInformalName: WebGoat
@@ -51,13 +45,6 @@ stages:
         isMicroService: no
         sast: true
         sca: false
-        #countLOC: false
         targetBranch: refs/heads/feature/define-default-branch
-        #gitHubScan: true 
-        #forceScan: true
-        #scanTimeout: 1 works
-        #generatePDFReport: true
-        #avoidDuplicateScans: true
-        #fullScansScheduled: true
-        #fullScanCycle: 2
+        gitHubScan: true
 
