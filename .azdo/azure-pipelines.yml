@@ -46,5 +46,5 @@ stages:
         sast: true
         sca: false
         #targetBranch: refs/heads/feature/define-default-branch
-        defaultBranch: main
+        defaultBranch: refs/heads/main
 
